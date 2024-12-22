@@ -5,16 +5,22 @@
   "imports": {
     "@discord/embedded-app-sdk": "npm:@discord/embedded-app-sdk@^1.8.1",
     "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.2",
-    "@types/react": "npm:@types/react@^19.0.2",
-    "@types/react-dom": "npm:@types/react-dom@^19.0.2",
+    "@react-three/fiber": "npm:@react-three/fiber@^8.17.10",
+    "@types/react": "npm:@types/react@^18.3.1",
+    "@types/react-dom": "npm:@types/react-dom@^18.3.1",
+    "@types/three": "npm:@types/three@^0.171.0",
     "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^4.3.4",
-    "phaser": "npm:phaser@^3.87.0",
-    "react": "npm:react@^19.0.0",
-    "react-dom": "npm:react-dom@^19.0.0",
+    "react": "npm:react@^18.3.1",
+    "react-dom": "npm:react-dom@^18.3.1",
+    "three": "npm:three@^0.171.0",
     "vite": "npm:vite@^6.0.5"
   },
   "compilerOptions": {
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "jsxImportSourceTypes": "@types/react"

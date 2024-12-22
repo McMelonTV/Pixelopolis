@@ -1,190 +1,204 @@
-import './App.css'
+import "./App.css";
 // @deno-types="@types/react"
-import { useState, useEffect, useRef } from 'react'
+import {useEffect, useRef, useState} from "react";
+import {Canvas, useFrame} from "@react-three/fiber";
+import {
+    BufferGeometry,
+    Euler,
+    EventHandlers,
+    ExtendedColors,
+    Layers,
+    Material,
+    Matrix4,
+    Mesh,
+    NodeProps,
+    NonFunctionKeys,
+    NormalBufferAttributes,
+    Object3DEventMap,
+    Overwrite,
+    Quaternion,
+    Vector3,
+} from "three";
+import {JSX} from "react/jsx-runtime";
 
-import { IRefPhaserGame, PhaserGame } from './game/PhaserGame.tsx';
-import { MainMenu } from './game/scenes/MainMenu.ts';
+import {VITE_CLIENT_ID} from "./env.ts";
 
-import { VITE_CLIENT_ID } from './env.ts'
+import {discordSdk} from "./discordSdk.ts"; // @deno-types="@discord/embedded-app-sdk"
+import {CommandResponse} from "@discord/embedded-app-sdk";
 
-import { discordSdk } from "./discordSdk.ts";
-// @deno-types="@discord/embedded-app-sdk"
-import { CommandResponse } from "@discord/embedded-app-sdk";
-
-type Auth = CommandResponse<'authenticate'>;
+type Auth = CommandResponse<"authenticate">;
 let auth: Auth;
 
 async function setupDiscordSdk() {
-    await discordSdk.ready();
+  await discordSdk.ready();
 
-    // Authorize with Discord Client
-    const { code } = await discordSdk.commands.authorize({
-        client_id: VITE_CLIENT_ID,
-        response_type: 'code',
-        state: '',
-        prompt: 'none',
-        // More info on scopes here: https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes
-        scope: [
-            // Activities will launch through app commands and interactions of user-installable apps.
-            // https://discord.com/developers/docs/tutorials/developing-a-user-installable-app#configuring-default-install-settings-adding-default-install-settings
-            // 'applications.commands',
+  // Authorize with Discord Client
+  const { code } = await discordSdk.commands.authorize({
+    client_id: VITE_CLIENT_ID,
+    response_type: "code",
+    state: "",
+    prompt: "none",
+    // More info on scopes here: https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes
+    scope: [
+      // Activities will launch through app commands and interactions of user-installable apps.
+      // https://discord.com/developers/docs/tutorials/developing-a-user-installable-app#configuring-default-install-settings-adding-default-install-settings
+      // 'applications.commands',
 
-            // "applications.builds.upload",
-            // "applications.builds.read",
-            // "applications.store.update",
-            // "applications.entitlements",
-            // "bot",
-            'identify',
-            // "connections",
-            // "email",
-            // "gdm.join",
-            // 'guilds',
-            // "guilds.join",
-            // 'guilds.members.read',
-            // "messages.read",
-            // "relationships.read",
-            // 'rpc.activities.write',
-            // "rpc.notifications.read",
-            // "rpc.voice.write",
-            // 'rpc.voice.read',
-            // "webhook.incoming",
-        ],
-    });
+      // "applications.builds.upload",
+      // "applications.builds.read",
+      // "applications.store.update",
+      // "applications.entitlements",
+      // "bot",
+      "identify",
+      // "connections",
+      // "email",
+      // "gdm.join",
+      // 'guilds',
+      // "guilds.join",
+      // 'guilds.members.read',
+      // "messages.read",
+      // "relationships.read",
+      // 'rpc.activities.write',
+      // "rpc.notifications.read",
+      // "rpc.voice.write",
+      // 'rpc.voice.read',
+      // "webhook.incoming",
+    ],
+  });
 
-    // Retrieve an access_token from your activity's server
-    // /.proxy/ is prepended here in compliance with CSP
-    // see https://discord.com/developers/docs/activities/development-guides#construct-a-full-url
-    const response = await fetch('/.proxy/api/token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            code,
-        }),
-    });
+  // Retrieve an access_token from your activity's server
+  // /.proxy/ is prepended here in compliance with CSP
+  // see https://discord.com/developers/docs/activities/development-guides#construct-a-full-url
+  const response = await fetch("/.proxy/api/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      code,
+    }),
+  });
 
-    const { access_token } = await response.json();
+  const { access_token } = await response.json();
 
-    // Authenticate with Discord client (using the access_token)
-    auth = await discordSdk.commands.authenticate({
-        access_token,
-    });
+  // Authenticate with Discord client (using the access_token)
+  auth = await discordSdk.commands.authenticate({
+    access_token,
+  });
 
-    if (auth == null) {
-        throw new Error('Authenticate command failed');
+  if (auth == null) {
+    throw new Error("Authenticate command failed");
+  }
+}
+
+function Box(
+  props:
+    & JSX.IntrinsicAttributes
+    & Omit<
+      ExtendedColors<
+        Overwrite<
+          Partial<
+            Mesh<
+              BufferGeometry<NormalBufferAttributes>,
+              Material | Material[],
+              Object3DEventMap
+            >
+          >,
+          NodeProps<
+            Mesh<
+              BufferGeometry<NormalBufferAttributes>,
+              Material | Material[],
+              Object3DEventMap
+            >,
+            Mesh
+          >
+        >
+      >,
+      NonFunctionKeys<
+        {
+          position?: Vector3;
+          up?: Vector3;
+          scale?: Vector3;
+          rotation?: Euler;
+          matrix?: Matrix4;
+          quaternion?: Quaternion;
+          layers?: Layers;
+          dispose?: (() => void) | null;
+        }
+      >
+    >
+    & {
+      position?: Vector3;
+      up?: Vector3;
+      scale?: Vector3;
+      rotation?: Euler;
+      matrix?: Matrix4;
+      quaternion?: Quaternion;
+      layers?: Layers;
+      dispose?: (() => void) | null;
     }
+    & EventHandlers,
+) {
+  // This reference will give us direct access to the mesh
+  const meshRef = useRef();
+  // Set up state for the hovered and active state
+  const [hovered, setHover] = useState(false);
+  const [active, setActive] = useState(false);
+  // Subscribe this component to the render-loop, rotate the mesh every frame
+  useFrame((state, delta) => {
+    if (!meshRef.current) return;
+    return (meshRef.current as any).rotation.x += delta;
+  });
+  // Return view, these are regular three.js elements expressed in JSX
+  return (
+    <mesh
+      {...props}
+      ref={meshRef}
+      scale={active ? 1.5 : 1}
+      onClick={(event) => setActive(!active)}
+      onPointerOver={(event) => setHover(true)}
+      onPointerOut={(event) => setHover(false)}
+    >
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color={hovered ? "hotpink" : "orange"} />
+    </mesh>
+  );
 }
 
 function App() {
-    const [loggedIn, setLoggedIn] = useState(false)
-    useEffect(() => {
-        setupDiscordSdk().then(() => {
-            setLoggedIn(true);
-            });
-    }, []);
+  const [loggedIn, setLoggedIn] = useState(false);
+  useEffect(() => {
+    setupDiscordSdk().then(() => {
+      setLoggedIn(true);
+    });
+  }, []);
 
-    // The sprite can only be moved in the MainMenu Scene
-    const [canMoveSprite, setCanMoveSprite] = useState(true);
-
-    //  References to the PhaserGame component (game and scene are exposed)
-    const phaserRef = useRef<IRefPhaserGame | null>(null);
-    const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
-
-    const changeScene = () => {
-
-        if(phaserRef.current)
-        {
-            const scene = phaserRef.current.scene as MainMenu;
-
-            if (scene)
-            {
-                scene.changeScene();
-            }
-        }
-    }
-
-    const moveSprite = () => {
-
-        if(phaserRef.current)
-        {
-
-            const scene = phaserRef.current.scene as MainMenu;
-
-            if (scene && scene.scene.key === 'MainMenu')
-            {
-                // Get the update logo position
-                scene.moveLogo(({ x, y }) => {
-
-                    setSpritePosition({ x, y });
-
-                });
-            }
-        }
-
-    }
-
-    const addSprite = () => {
-
-        if (phaserRef.current)
-        {
-            const scene = phaserRef.current.scene;
-
-            if (scene)
-            {
-                // Add more stars
-                const x = Phaser.Math.Between(64, scene.scale.width - 64);
-                const y = Phaser.Math.Between(64, scene.scale.height - 64);
-
-                //  `add.sprite` is a Phaser GameObjectFactory method and it returns a Sprite Game Object instance
-                const star = scene.add.sprite(x, y, 'star');
-
-                //  ... which you can then act upon. Here we create a Phaser Tween to fade the star sprite in and out.
-                //  You could, of course, do this from within the Phaser Scene code, but this is just an example
-                //  showing that Phaser objects and systems can be acted upon from outside of Phaser itself.
-                scene.add.tween({
-                    targets: star,
-                    duration: 500 + Math.random() * 1000,
-                    alpha: 0,
-                    yoyo: true,
-                    repeat: -1
-                });
-            }
-        }
-    }
-
-    // Event emitted from the PhaserGame component
-    const currentScene = (scene: Phaser.Scene) => {
-
-        setCanMoveSprite(scene.scene.key !== 'MainMenu');
-
-    }
-
-    return (
-        loggedIn ? (
-            <div id="app">
-                <PhaserGame ref={phaserRef} currentActiveScene={currentScene}/>
-                <div>
-                    <p>Channel ID: {discordSdk.channelId}</p>
-                    <div>
-                        <button className="button" onClick={changeScene}>Change Scene</button>
-                    </div>
-                    <div>
-                        <button disabled={canMoveSprite} className="button" onClick={moveSprite}>Toggle Movement
-                        </button>
-                    </div>
-                    <div className="spritePosition">Sprite Position:
-                        <pre>{`{\n  x: ${spritePosition.x}\n  y: ${spritePosition.y}\n}`}</pre>
-                    </div>
-                    <div>
-                        <button className="button" onClick={addSprite}>Add New Sprite</button>
-                    </div>
-                </div>
-            </div>
-        ) : (
-            <div>Loading...</div>
-        )
-    )
+  return (
+    loggedIn
+      ? (
+        <>
+          <p>Test</p>
+          <Canvas>
+            <ambientLight intensity={Math.PI / 2} />
+            <spotLight
+              position={[10, 10, 10]}
+              angle={0.15}
+              penumbra={1}
+              decay={0}
+              intensity={Math.PI}
+            />
+            <pointLight
+              position={[-10, -10, -10]}
+              decay={0}
+              intensity={Math.PI}
+            />
+            <Box position={[-1.2, 0, 0]} />
+            <Box position={[1.2, 0, 0]} />
+          </Canvas>
+        </>
+      )
+      : <div>Loading...</div>
+  );
 }
 
-export default App
+export default App;
