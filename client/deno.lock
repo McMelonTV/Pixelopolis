@@ -8,6 +8,7 @@
     "npm:@types/react@19.0.2": "19.0.2",
     "npm:@types/react@^19.0.2": "19.0.2",
     "npm:@vitejs/plugin-react@^4.3.4": "4.3.4_vite@6.0.5_@babel+core@7.26.0",
+    "npm:phaser@^3.87.0": "3.87.0",
     "npm:react-dom@19": "19.0.0_react@19.0.0",
     "npm:react@19": "19.0.0",
     "npm:vite@*": "6.0.5_@types+node@22.5.4",
@@ -503,6 +504,12 @@
     "node-releases@2.0.19": {
       "integrity": "sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw=="
     },
+    "phaser@3.87.0": {
+      "integrity": "sha512-AyI1b3T5fp05gzf6WUmu2FNqaZL+Y7w88yBRLf7YZXF9bncUSHpnDrupnTGoPqy/RKHRLBcay7zWeqQ2wiMWcw==",
+      "dependencies": [
+        "eventemitter3"
+      ]
+    },
     "picocolors@1.1.1": {
       "integrity": "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA=="
     },
@@ -609,6 +616,7 @@
       "npm:@types/react-dom@^19.0.2",
       "npm:@types/react@^19.0.2",
       "npm:@vitejs/plugin-react@^4.3.4",
+      "npm:phaser@^3.87.0",
       "npm:react-dom@19",
       "npm:react@19",
       "npm:vite@^6.0.5"
