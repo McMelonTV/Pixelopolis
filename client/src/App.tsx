@@ -177,7 +177,7 @@ function App() {
     loggedIn
       ? (
         <>
-          <p>Test</p>
+          <p>Channel ID: {discordSdk.channelId}</p>
           <Canvas>
             <ambientLight intensity={Math.PI / 2} />
             <spotLight
