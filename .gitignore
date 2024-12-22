@@ -7,10 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+.vite
 
 # Sensitive environment variables
-.env
+server/.env
 
 # Modules + built files
 node_modules

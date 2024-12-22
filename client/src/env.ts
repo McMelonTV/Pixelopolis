@@ -1,0 +1,1 @@
+export const VITE_CLIENT_ID = "1075077087704125490";
